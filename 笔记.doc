@@ -1,0 +1,98 @@
+一、pandas:
+    import pandas as pd 
+    data = pd.read_csv(csv_file)  读取csv文件
+    data1 = data.iloc[:, 1] 读取第二列
+    data2 = data.iloc[:,2:].values  读取矩阵
+    df = pd.DataFrame(data,columns = ["x", "y"], index = None)  按格式读取
+    df.tocsv(csv_file) 保存到CSV文件
+
+二、定义自己的数据集类并使用
+    from torch.utils.data import Dataset, DataLoader
+    class MyDataset(Dataset):
+        def __init__(self):
+            self.data = pd.read_csv("...")
+
+        def __getitem__(self, index):
+            label = self.data.iloc[index, 1]
+            label = label.astype('float32').reshape(-1)
+            data = self.data.iloc[index,2]
+            data = data.astype('float32').reshape(-1)  
+            return label, data
+        
+        def __len__(self):
+            return len(self.data)
+    my_dataset = MyDataset()
+    dataloader = DataLoader(dataset = my_dataset,batch_size = 2,shuffle = True)
+    for i ,(label, data) in enumerate(dataloader):
+        print(label, data)
+
+三、保存、加载模型
+    torch.save(model.state_dict(), "...")
+    torch.save(optimizer.state_dict(), "...")
+    model.load_state_dict(torch.load("..."))
+    optimizer.load_state_dict(torch.load("..."))
+
+四、matplotlib
+4.1 二维画图
+    import numpy as np
+    import matplotlib.pyplot as plt
+    #绘图时可以显示中文
+    plt.rcParams['font.sans-serif']=['SimHei']
+    plt.rcParams['axes.unicode_minus']=False
+
+    fig = plt.figure() #创建画布
+    ax1 = fig.add_subplot(2,2,1) #创建多个子图
+    x = np.linspace(-10,10,100)
+    y = np.sin(x)
+    plt.axis([-10,10,-2,2]) #设置坐标轴 
+    plt.axis("off") #不显示坐标轴
+    plt.plot(x,y,color='r'，ls='-'，lw=5)
+    plt.show()
+    plt.xlim(-6,6) #设置x轴的坐标范围
+    plt.ylim(-2,2) #设置y轴的坐标范围
+    ax.set_xlabel('x轴',fontproperties='KaiTi',fontsize=30)
+    ax.set_ylabel('y轴',fontproperties='KaiTi',fontsize=30)
+    ax.set_title('title',fontsize=16)
+    # 添加图例
+    plt.plot(x,y,label='aaa')
+    plt.plot(x+1,y-1,label='bbb')
+    plt.legend()
+    fig.savefig(filename='./111.jpg',dpi=500) #保存图片
+    ax.set_facecolor('green') #背景色
+    #直方图
+    x=[1,2,2,3,4,4,5]
+    plt.hist(x,color='red')
+    #条形图
+    x=[1,2,3,4,5]
+    y=[1,2,3,4,5]
+    plt.bar(x,y,0.5)
+    plt.barh(x,y,0.5) #水平条形图
+    #饼图
+    arr=[11,22,31,15]
+    plt.pie(arr,labels=['a','b','c','d']，labeldistance=0.3,autopct='%.6f%%')
+    #图内文字
+    plt.text(0.7,1,s='第三',fontsize=40)
+    plt.figtext(0.4,0.8,s='排名',fontsize=40)
+
+
+
+4.2 三维画图
+    from matplotlib import pyplot as plt 
+    import numpy as np 
+    x = np.linspace(-10,10,100)
+    y = np.linspace(-10,10,100)
+    z = np.sqrt(x**2 + y**2)
+    X,Y = np.meshgrid(x,y) #有x,y生成一个方阵，作为三维图像的底面shape为x,y的shape乘积
+    Z = np.sqrt(X**2 + Y**2)
+    fig = plt.figure() #生成二维画布
+    ax = fig.add_subplot(221,projection='3d') #转化为三维坐标系
+    ax2 = fig.add_subplot(222,projection='3d') #转化为三维坐标系
+    ax3 = fig.add_subplot(223,projection='3d') #转化为三维坐标系
+    ax1.plot_surface(X,Y,Z, rstride=1, cstride=1,cmap="rainbow") #画三维曲面图（连续）
+    ax2.scatter(x,y,z,c="skyblue",s=60) #画散点图
+    ax3.plot_trisurf(x,y,z,cmap="rainbow", linewidth=0.01) #画散点图的三角连接图
+    ax1.set_title("三维曲面图")
+    ax2.set_title("三维散点图")
+    ax3.set_title("散点三角连线图")
+    plt.show()
+   
